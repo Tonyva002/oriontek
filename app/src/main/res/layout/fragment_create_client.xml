@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.fragments.CreateClientFragment">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_md">
+
+            <!-- Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardView"
+                android:layout_width="0dp"
+                android:layout_height="250dp"
+                android:layout_marginTop="@dimen/spacing_xxl"
+                app:cardCornerRadius="@dimen/spacing_md"
+                app:cardElevation="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imgPhoto"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/photo_01"
+                        app:shapeAppearanceOverlay="@style/RoundedImage"/>
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/btnChangePhoto"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="@dimen/spacing_md"
+                        android:contentDescription="@string/message_client_image"
+                        app:srcCompat="@drawable/ic_camera"
+                        app:backgroundTint="?attr/colorPrimary"/>
+                </FrameLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!--  PERSONALS DATA-->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:hint="@string/name"
+                app:helperText="@string/required"
+                app:endIconMode="clear_text"
+                app:counterMaxLength="@integer/counter_max_name"
+                app:counterEnabled="true"
+                app:startIconDrawable="@drawable/ic_person"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cardView"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="@integer/counter_max_name"
+                    android:inputType="textCapWords" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilLastname"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:hint="@string/lastname"
+                app:helperText="@string/required"
+                app:endIconMode="clear_text"
+                app:counterMaxLength="@integer/counter_max_name"
+                app:counterEnabled="true"
+                app:startIconDrawable="@drawable/ic_person"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilName"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLastname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="@integer/counter_max_name"
+                    android:inputType="textCapWords" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilCompany"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:hint="@string/company"
+                app:helperText="@string/required"
+                app:endIconMode="clear_text"
+                app:counterMaxLength="@integer/counter_max_name"
+                app:counterEnabled="true"
+                app:startIconDrawable="@drawable/ic_company"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilLastname"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etCompany"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="@integer/counter_max_name"
+                    android:inputType="textCapWords"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- CONTACT -->
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEmail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:hint="@string/email"
+                app:helperText="@string/required"
+                app:endIconMode="clear_text"
+                app:counterMaxLength="@integer/counter_max_name"
+                app:counterEnabled="true"
+                app:startIconDrawable="@drawable/ic_email"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilCompany"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="@integer/counter_max_name"
+                    android:inputType="textEmailAddress"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPhone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:hint="@string/phone"
+                app:helperText="@string/required"
+                app:endIconMode="clear_text"
+                app:counterMaxLength="@integer/counter_max_phone"
+                app:counterEnabled="true"
+                app:startIconDrawable="@drawable/ic_call"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilEmail"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="@integer/counter_max_phone"
+                    android:inputType="phone"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:hint="@string/address"
+                app:helperText="@string/required"
+                app:endIconMode="clear_text"
+                app:counterMaxLength="@integer/counter_max_name"
+                app:counterEnabled="true"
+                app:startIconDrawable="@drawable/ic_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilPhone"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="@integer/counter_max_name"
+                    android:inputType="textCapWords"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilAddress2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:hint="@string/address2"
+                app:endIconMode="clear_text"
+                app:counterMaxLength="@integer/counter_max_name"
+                app:counterEnabled="true"
+                app:startIconDrawable="@drawable/ic_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tilAddress"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etAddress2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="@integer/counter_max_name"
+                    android:inputType="textCapWords"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
+

@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Oriontek</string>
+
+    <!-- Fields -->
+    <string name="name">Nombre</string>
+    <string name="lastname">Apellido</string>
+    <string name="company">Companía</string>
+    <string name="email">Correo electronico</string>
+    <string name="phone">Telefono</string>
+    <string name="address">Dirección</string>
+    <string name="address2">Dirección 2</string>
+    <string name="required">Requerido</string>
+    <string name="save">Guardar</string>
+
+    <string name="call">Llamar</string>
+    <string name="arg_id">ARG_ID</string>
+    <string name="update_client">Actualizar cliente</string>
+    <string name="create_client">Crear cliente</string>
+    <string name="title">Clientes</string>
+    <string name="select_image">Seleccionar imagen</string>
+    <string name="cancel">Cancelar</string>
+
+
+    <!-- Message -->
+    <string name="message_client_image">Imagen del cliente</string>
+    <string name="message_field_valid">Complete los campos requeridos</string>
+    <string name="message_error_while_loading">Error al cargar los datos </string>
+    <string name="message_no_changes_detected">No has realizado ningún cambio.</string>
+    <string name="message_error_save">Error al guardar </string>
+    <string name="message_created_success">Creado correctamente</string>
+    <string name="message_updated_success">Updatedo correctamente</string>
+    <string name="message_error_deleting">Error al eliminar </string>
+    <string name="message_no_compatible_app_found">No se encontró ninguna aplicación compatible.</string>
+
+    <string name="dialog_delete_title">Eliminar al client?</string>
+    <string name="dialog_delete_confirm">Eliminar</string>
+    <string name="dialog_delete_cancel">Cancelar</string>
+    <string name="dialog_options_title">Qué es lo que quieres hacer?</string>
+    <string name="dialog_exit_title">Salir de esta pantalla?</string>
+    <string name="dialog_exit_message">Si no has guardado los cambios, se perderán..</string>
+    <string name="dialog_exit_ok">Salir</string>
+
+
+</resources>

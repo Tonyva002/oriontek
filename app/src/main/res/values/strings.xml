@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Oriontek</string>
+
+    <!-- Fields -->
+    <string name="name">Name</string>
+    <string name="lastname">Lastname</string>
+    <string name="company">Company</string>
+    <string name="email">Email</string>
+    <string name="phone">Phone</string>
+    <string name="address">Address</string>
+    <string name="address2">Address 2</string>
+    <string name="required">Required</string>
+    <string name="save">Save</string>
+
+    <string name="call">Call</string>
+    <string name="arg_id">ARG_ID</string>
+    <string name="update_client">Update client</string>
+    <string name="create_client">Create client</string>
+    <string name="title">Clients</string>
+    <string name="select_image">Select image</string>
+    <string name="cancel">Cancel</string>
+
+
+    <!-- Message -->
+    <string name="message_client_image">Client image</string>
+    <string name="message_field_valid">Complete the required fields</string>
+    <string name="message_error_while_loading">Error loading data </string>
+    <string name="message_no_changes_detected">You have not made any changes.</string>
+    <string name="message_error_save">Error to save </string>
+    <string name="message_created_success">Created successfully</string>
+    <string name="message_updated_success">Updated successfully</string>
+    <string name="message_error_deleting">Error deleting </string>
+    <string name="message_no_compatible_app_found">No compatible app found</string>
+
+    <string name="dialog_delete_title">Delete Client?</string>
+    <string name="dialog_delete_confirm">Delete</string>
+    <string name="dialog_delete_cancel">Cancel</string>
+    <string name="dialog_options_title">What do you want to do?</string>
+    <string name="dialog_exit_title">Exit this screen?</string>
+    <string name="dialog_exit_message">If you have not saved the changes they will be lost.</string>
+    <string name="dialog_exit_ok">Go out</string>
+
+
+</resources>
