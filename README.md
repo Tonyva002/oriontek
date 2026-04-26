@@ -47,7 +47,7 @@ Install Android Studio
 ### 4) Diferentes direcciones
 ![Screen 4](https://github.com/user-attachments/assets/a8659940-1d4f-45e2-a375-1a508b4e3b2b)
 
-### 5) Click prolongado y permite eliminar y llamar al cliente
+### 5) Click prolongado permite eliminar y llamar al cliente
 ![Screen 5](https://github.com/user-attachments/assets/2e8b80a9-08cc-481a-a22c-f8c997319117)
 
 ### 6) Clientes
