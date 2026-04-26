@@ -3,7 +3,7 @@
 
 ## PROJECT DESCRIPTION
 
-Se desea tener el control de todos los clientes pertenecientes a la empresa OrionTek donde cada cliente puede tener N cantidad de direcciones.
+The goal is to have control over all clients belonging to the company OrionTek, where each client can have N number of addresses.
 
 ### Links
 📌 Live site URL: [here](https://github.com/Tonyva002/oriontek)
