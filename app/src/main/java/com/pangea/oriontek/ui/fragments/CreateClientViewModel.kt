@@ -29,14 +29,10 @@ class CreateClientViewModel @Inject constructor(
     private val _events = MutableSharedFlow<CreateClientEvent>()
     val events = _events.asSharedFlow()
 
-    // ====================
-    // LOAD
-    // ====================
-
+    // Cargar los clientes
     fun loadClient(id: Long) {
         viewModelScope.launch {
             _uiState.value = CreateClientUiState.Loading
-
             getClientById(id).collect { result ->
 
                 if (result != null) {
@@ -46,12 +42,10 @@ class CreateClientViewModel @Inject constructor(
                 }
             }
         }
+
     }
 
-    // ====================
-    // SAVE
-    // ====================
-
+    // Guardar cliente
     fun saveClient(
         original: ClientWithAddresses?,
         updatedClient: Client,

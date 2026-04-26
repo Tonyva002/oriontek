@@ -53,6 +53,8 @@ class HomeActivity : AppCompatActivity() {
         setupBackStackListener()
         observeUiState()
         observeEvents()
+
+        viewModel.loadClients()
         newClient()
 
     }

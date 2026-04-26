@@ -9,6 +9,7 @@ import com.pangea.oriontek.domain.usecase.client.GetClientsUseCase
 import com.pangea.oriontek.ui.home.states.HomeEvent
 import com.pangea.oriontek.ui.home.states.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,15 +30,11 @@ class HomeViewModel @Inject constructor(
     private val _events = MutableSharedFlow<HomeEvent>()
     val events = _events.asSharedFlow()
 
-    init {
-        observeStores()
-    }
+    private var loadJob: Job? = null
 
-    private fun observeStores() {
+    fun loadClients() {
+        loadJob?.cancel()
         viewModelScope.launch {
-
-            _uiState.value = HomeUiState.Loading
-
             getClients()
                 .catch { e ->
                     _uiState.value = HomeUiState.Error(e.message ?: "Error loading Clients")

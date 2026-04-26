@@ -266,6 +266,8 @@ class CreateClientFragment : Fragment() {
             }
         }
 
+        indexPhoto = photos.indexOf(client.photoResId).takeIf { it != -1 } ?: 0
+
         val photo = if (client.photoResId != 0) {
             client.photoResId
         } else {
@@ -377,10 +379,6 @@ class CreateClientFragment : Fragment() {
         indexPhoto = 0
         imgPhoto.setImageResource(R.drawable.photo_01)
 
-        // Scroll arriba
-        main.post {
-            main.smoothScrollTo(0, 0)
-        }
         isCleaning = false
     }
 
