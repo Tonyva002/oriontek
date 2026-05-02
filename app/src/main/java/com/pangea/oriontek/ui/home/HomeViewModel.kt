@@ -28,31 +28,34 @@ class HomeViewModel @Inject constructor(
 
     private var loadJob: Job? = null
 
+    // Cargar clientes
     fun loadClients() {
         // Cancelar carga anterior si existe
         loadJob?.cancel()
 
         loadJob = viewModelScope.launch {
-            // Mostrar loading cada vez que se recarga
-            _uiState.value = HomeUiState.Loading
+            try {
+                _uiState.value = HomeUiState.Loading
 
-            getClients()
-                .catch { e ->
-                    _uiState.value = HomeUiState.Error(
-                        e.message ?: "Error loading clients"
-                    )
-                    _events.emit(
-                        HomeEvent.ShowMessage(R.string.message_error_loading)
-                    )
-                }
-                .collect { stores ->
+                getClients().collect { clients ->
                     _uiState.value = HomeUiState.Success(
-                        stores.map { it.client }
+                        clients.map { it.client }
                     )
                 }
+
+            } catch (e: Exception) {
+                _uiState.value = HomeUiState.Error(
+                    e.message ?: "Error loading clients"
+                )
+
+                _events.emit(
+                    HomeEvent.ShowMessage(R.string.message_error_loading)
+                )
+            }
         }
     }
 
+    // Eliminar cliente
     fun delete(client: Client) {
         viewModelScope.launch {
             runCatching {

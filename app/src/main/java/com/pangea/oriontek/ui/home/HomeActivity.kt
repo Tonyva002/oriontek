@@ -34,6 +34,10 @@ class HomeActivity : AppCompatActivity() {
 
     private val viewModel: HomeViewModel by viewModels()
 
+    companion object {
+        const val ARG_ID = "arg_id"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -60,6 +64,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
+    // Toolbar
     private fun setupToolbar() {
         setSupportActionBar(binding.itoolbar.toolbar)
         supportActionBar?.apply {
@@ -87,12 +92,12 @@ class HomeActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         adapter = ClientAdapter(
-            onClick = { store ->
-                openDetail(store)
+            onClick = { client ->
+                openDetail(client)
             },
 
-            onDelete = { store ->
-                showOptionsDialog(store)
+            onLongClick = { client ->
+                showOptionsDialog(client)
             }
         )
         binding.recyclerView.apply {
@@ -132,7 +137,7 @@ class HomeActivity : AppCompatActivity() {
 
                         is HomeUiState.Error -> {
                             binding.progressBar.visibility = View.GONE
-                            binding.recyclerView.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.GONE
 
                             Toast.makeText(
                                 this@HomeActivity,
@@ -162,40 +167,39 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    // Agregar nuevo cliente
+    // Abre pantalla para crear cliente
     private fun newClient() {
         binding.fab.setOnClickListener {
-            launchEditFragment()
+            launchCreateClientFragment()
         }
     }
 
 
-    // -------------------------
-    // Navigation
-    // -------------------------
+
+    // Navegación, abrir detalle, envía ID al fragment
     private fun openDetail(client: Client) {
         val args = Bundle().apply {
-            putLong(getString(R.string.arg_id), client.id)
+            putLong(ARG_ID, client.id)
         }
-        launchEditFragment(args)
+        launchCreateClientFragment(args)
 
     }
 
-    private fun launchEditFragment(args: Bundle? = null) {
+    // Lanzar fragment
+    private fun launchCreateClientFragment(args: Bundle? = null) {
         val fragment = CreateClientFragment().apply {
             arguments = args
         }
-
         supportFragmentManager.beginTransaction()
+            .setReorderingAllowed(true)
             .replace(R.id.main, fragment)
-            .addToBackStack(null)
+            .addToBackStack(CreateClientFragment::class.java.simpleName)
             .commit()
 
     }
 
-    // -------------------------
-    // Dialogs
-    // -------------------------
+
+    // Dialog de opciones (eliminar, llamar)
     private fun showOptionsDialog(client: Client) {
         val options = resources.getStringArray(R.array.array_options_item)
 
@@ -212,7 +216,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-    // Eliminar cliente
+    // Confirmar eliminación del cliente
     private fun confirmDelete(client: Client) {
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.dialog_delete_title)
@@ -230,6 +234,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
+    // Manejo seguro de intent, evita crash si no hay app compatible
     private fun startIntent(intent: Intent) {
         runCatching {
             startActivity(intent)

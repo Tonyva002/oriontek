@@ -22,6 +22,7 @@ import com.pangea.oriontek.domain.model.Client
 import com.pangea.oriontek.domain.model.ClientWithAddresses
 import com.pangea.oriontek.ui.fragments.states.CreateClientEvent
 import com.pangea.oriontek.ui.fragments.states.CreateClientUiState
+import com.pangea.oriontek.ui.home.HomeActivity.Companion.ARG_ID
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -64,7 +65,7 @@ class CreateClientFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val id = arguments?.getLong(getString(R.string.arg_id), 0L) ?: 0L
+        val id = arguments?.getLong(ARG_ID, 0L) ?: 0L
         isEditMode = id != 0L
 
         setupActionBar()

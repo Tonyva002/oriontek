@@ -9,7 +9,7 @@ import com.pangea.oriontek.domain.model.Client
 class ClientViewHolder(
     private val binding: ItemClientBinding,
     private val onClick: (Client) -> Unit,
-    private val onDelete: (Client) -> Unit
+    private val onLongClick: (Client) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
 
@@ -31,7 +31,7 @@ class ClientViewHolder(
         root.setOnClickListener { onClick(client) }
 
         root.setOnLongClickListener {
-            onDelete(client)
+            onLongClick(client)
             true
         }
 

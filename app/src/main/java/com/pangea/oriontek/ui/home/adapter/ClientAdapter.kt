@@ -4,13 +4,12 @@ package com.pangea.oriontek.ui.home.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import com.pangea.oriontek.R
 import com.pangea.oriontek.databinding.ItemClientBinding
 import com.pangea.oriontek.domain.model.Client
 
 class ClientAdapter(
     private val onClick: (Client) -> Unit,
-    private val onDelete: (Client) -> Unit
+    private val onLongClick: (Client) -> Unit
 
 ) : ListAdapter<Client, ClientViewHolder>(ClientDiffCallback()) {
     override fun onCreateViewHolder(
@@ -24,7 +23,7 @@ class ClientAdapter(
                 false
             )
 
-            return ClientViewHolder(binding, onClick, onDelete)
+            return ClientViewHolder(binding, onClick, onLongClick)
 
     }
 

@@ -13,7 +13,6 @@
     <string name="save">Guardar</string>
 
     <string name="call">Llamar</string>
-    <string name="arg_id">ARG_ID</string>
     <string name="update_client">Actualizar cliente</string>
     <string name="create_client">Crear cliente</string>
     <string name="title">Clientes</string>

@@ -10,16 +10,21 @@
       <w>Cargar</w>
       <w>Configuracion</w>
       <w>Configuramos</w>
+      <w>Confirmar</w>
       <w>Eliminar</w>
       <w>Foto</w>
       <w>Guardar</w>
       <w>Insertar</w>
+      <w>Lanzar</w>
       <w>Limpiar</w>
       <w>Llenar</w>
+      <w>Manejo</w>
       <w>Mostrar</w>
+      <w>Navegación</w>
       <w>Obtener</w>
       <w>Seleccionar</w>
       <w>Verifica</w>
+      <w>abrir</w>
       <w>anteriores</w>
       <w>apellido</w>
       <w>arriba</w>
@@ -27,9 +32,14 @@
       <w>cliente</w>
       <w>clientes</w>
       <w>compañia</w>
+      <w>crear</w>
       <w>datos</w>
+      <w>detalle</w>
       <w>devuelve</w>
       <w>direcciones</w>
+      <w>eliminación</w>
+      <w>eliminar</w>
+      <w>envía</w>
       <w>errores</w>
       <w>esperar</w>
       <w>exactamente</w>
@@ -39,11 +49,15 @@
       <w>función</w>
       <w>hubo</w>
       <w>itoolbar</w>
+      <w>llamar</w>
       <w>nombre</w>
       <w>nuevas</w>
+      <w>opciones</w>
       <w>originales</w>
+      <w>pantalla</w>
       <w>recarga</w>
       <w>retorno</w>
+      <w>seguro</w>
     </words>
   </dictionary>
 </component>
