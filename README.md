@@ -20,6 +20,7 @@ The goal is to have control over all clients belonging to the company OrionTek, 
 - JUnit 
 - MVVM
 - Clean Architecture
+- Multilingual, English - Spanish
 
 ### Necessary tool:
 
