@@ -10,11 +10,7 @@ import com.pangea.oriontek.ui.home.states.HomeEvent
 import com.pangea.oriontek.ui.home.states.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,7 +21,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
-    val uiState: StateFlow<HomeUiState> = _uiState
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     private val _events = MutableSharedFlow<HomeEvent>()
     val events = _events.asSharedFlow()
@@ -33,12 +29,21 @@ class HomeViewModel @Inject constructor(
     private var loadJob: Job? = null
 
     fun loadClients() {
+        // Cancelar carga anterior si existe
         loadJob?.cancel()
-        viewModelScope.launch {
+
+        loadJob = viewModelScope.launch {
+            // Mostrar loading cada vez que se recarga
+            _uiState.value = HomeUiState.Loading
+
             getClients()
                 .catch { e ->
-                    _uiState.value = HomeUiState.Error(e.message ?: "Error loading Clients")
-                    _events.emit(HomeEvent.ShowMessage(R.string.message_error_deleting))
+                    _uiState.value = HomeUiState.Error(
+                        e.message ?: "Error loading clients"
+                    )
+                    _events.emit(
+                        HomeEvent.ShowMessage(R.string.message_error_loading)
+                    )
                 }
                 .collect { stores ->
                     _uiState.value = HomeUiState.Success(
@@ -48,13 +53,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-
     fun delete(client: Client) {
         viewModelScope.launch {
-            try {
+            runCatching {
                 deleteClient(client)
-            } catch (_: Exception) {
-                _events.emit(HomeEvent.ShowMessage(R.string.message_error_deleting))
+            }.onFailure {
+                _events.emit(
+                    HomeEvent.ShowMessage(R.string.message_error_deleting)
+                )
             }
         }
     }

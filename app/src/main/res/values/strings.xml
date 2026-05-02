@@ -24,7 +24,7 @@
     <!-- Message -->
     <string name="message_client_image">Client image</string>
     <string name="message_field_valid">Complete the required fields</string>
-    <string name="message_error_while_loading">Error loading data </string>
+    <string name="message_error_loading">Error loading data </string>
     <string name="message_no_changes_detected">You have not made any changes.</string>
     <string name="message_error_save">Error to save </string>
     <string name="message_created_success">Created successfully</string>

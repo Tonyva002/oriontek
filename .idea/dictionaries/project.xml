@@ -5,32 +5,45 @@
       <w>Actualizar</w>
       <w>Agregar</w>
       <w>Buscar</w>
+      <w>Calle</w>
+      <w>Cancelar</w>
+      <w>Cargar</w>
       <w>Configuracion</w>
+      <w>Configuramos</w>
       <w>Eliminar</w>
       <w>Foto</w>
       <w>Guardar</w>
       <w>Insertar</w>
       <w>Limpiar</w>
       <w>Llenar</w>
+      <w>Mostrar</w>
       <w>Obtener</w>
       <w>Seleccionar</w>
       <w>Verifica</w>
       <w>anteriores</w>
       <w>apellido</w>
       <w>arriba</w>
+      <w>cada</w>
       <w>cliente</w>
       <w>clientes</w>
       <w>compañia</w>
       <w>datos</w>
+      <w>devuelve</w>
       <w>direcciones</w>
       <w>errores</w>
+      <w>esperar</w>
+      <w>exactamente</w>
+      <w>existe</w>
       <w>formulario</w>
       <w>foto</w>
+      <w>función</w>
       <w>hubo</w>
       <w>itoolbar</w>
       <w>nombre</w>
       <w>nuevas</w>
       <w>originales</w>
+      <w>recarga</w>
+      <w>retorno</w>
     </words>
   </dictionary>
 </component>
