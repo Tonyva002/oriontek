@@ -29,23 +29,29 @@ class CreateClientViewModel @Inject constructor(
     private val _events = MutableSharedFlow<CreateClientEvent>()
     val events = _events.asSharedFlow()
 
-    // Cargar los clientes
+    // Cargar cliente por id
     fun loadClient(id: Long) {
         viewModelScope.launch {
             _uiState.value = CreateClientUiState.Loading
-            getClientById(id).collect { result ->
+
+            try {
+                val result = getClientById(id).first()
 
                 if (result != null) {
                     _uiState.value = CreateClientUiState.Success(result)
                 } else {
                     _uiState.value = CreateClientUiState.Error("Client not found")
                 }
+
+            } catch (e: Exception) {
+                _uiState.value = CreateClientUiState.Error(
+                    e.message ?: "Error loading client"
+                )
             }
         }
-
     }
 
-    // Guardar cliente
+    // Guardar o actualizar cliente
     fun saveClient(
         original: ClientWithAddresses?,
         updatedClient: Client,
