@@ -6,22 +6,14 @@ import com.pangea.oriontek.domain.model.ClientWithAddresses
 import com.pangea.oriontek.domain.usecase.client.GetClientByIdUseCase
 import com.pangea.oriontek.domain.usecase.client.InsertClientWithAddressesUseCase
 import com.pangea.oriontek.domain.usecase.client.UpdateClientWithAddressesUseCase
-import com.pangea.oriontek.ui.fragments.states.CreateClientEvent
-import com.pangea.oriontek.ui.fragments.states.CreateClientUiState
+import com.pangea.oriontek.ui.fragments.states.*
 import com.pangea.oriontek.utils.MainDispatcherRule
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import kotlinx.coroutines.test.*
+import org.junit.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CreateClientViewModelTest {
@@ -29,8 +21,8 @@ class CreateClientViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private val insertClient: InsertClientWithAddressesUseCase = mockk()
-    private val updateClient: UpdateClientWithAddressesUseCase = mockk()
+    private val insertClient: InsertClientWithAddressesUseCase = mockk(relaxed = true)
+    private val updateClient: UpdateClientWithAddressesUseCase = mockk(relaxed = true)
     private val getClientById: GetClientByIdUseCase = mockk()
 
     private lateinit var viewModel: CreateClientViewModel
@@ -44,7 +36,9 @@ class CreateClientViewModelTest {
         )
     }
 
+    // -------------------------
     // LOAD CLIENT
+    // -------------------------
     @Test
     fun `loadClient - success`() = runTest {
         val client = ClientWithAddresses(
@@ -55,12 +49,10 @@ class CreateClientViewModelTest {
         coEvery { getClientById(1) } returns flowOf(client)
 
         viewModel.loadClient(1)
-
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-
-        assert(state is CreateClientUiState.Success)
+        assert(state is CreateClientUiState.Form)
     }
 
     @Test
@@ -68,86 +60,165 @@ class CreateClientViewModelTest {
         coEvery { getClientById(1) } returns flowOf(null)
 
         viewModel.loadClient(1)
-
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-
         assert(state is CreateClientUiState.Error)
     }
 
-
-    // SAVE CLIENT - CREATE
+    // -------------------------
+    // CREATE CLIENT
+    // -------------------------
     @Test
     fun `saveClient - create new client`() = runTest {
-        val client = Client(id = 0, name = "Tony", lastName = "Test")
-        val addresses = emptyList<Address>()
-        coEvery { insertClient(client, addresses) } returns Unit
 
-        val eventList = mutableListOf<CreateClientEvent>()
-        val job = launch { viewModel.events.toList(eventList) }
+        val events = mutableListOf<CreateClientEvent>()
+        val job = launch { viewModel.events.toList(events) }
 
-        viewModel.saveClient(null, client, addresses)
+        viewModel.saveClient(
+            name = "Tony",
+            lastName = "Test",
+            email = "test@mail.com",
+            company = "Orion",
+            phone = "123",
+            address1 = "Address 1",
+            address2 = "",
+            photoResId = 1
+        )
+
         advanceUntilIdle()
 
-        coVerify(exactly = 1) { insertClient(client, addresses) }
-        assert(eventList.any { it is CreateClientEvent.Created })
+        coVerify { insertClient(any(), any()) }
+        assert(events.any { it is CreateClientEvent.Created })
 
         job.cancel()
     }
 
-    // SAVE CLIENT - UPDATE
+    // -------------------------
+    // UPDATE CLIENT
+    // -------------------------
     @Test
     fun `saveClient - update existing client`() = runTest {
-        val original = ClientWithAddresses(
-            client = Client(id = 1, name = "Tony", lastName = "Old"),
-            addresses = emptyList()
+        // 1. Definimos el cliente "antiguo" que ya está en el sistema
+        val originalClient = Client(
+            id = 1,
+            name = "Tony",
+            lastName = "Old",
+            email = "old@mail.com",
+            company = "Orion",
+            phone = "123",
+            photoResId = 1
         )
 
-        val updatedClient = original.client.copy(name = "Tony Updated")
+        val formState = CreateClientFormState(
+            client = originalClient,
+            addresses = listOf(Address(10, "Calle Antigua", 1)),
+            isEditMode = true
+        )
 
-        coEvery { updateClient(updatedClient, emptyList()) } returns Unit
+        // Seteamos el estado inicial manualmente (usando tu metodo de reflexión)
+        viewModel.apply {
+            val field = this::class.java.getDeclaredField("_uiState")
+            field.isAccessible = true
+            val stateFlow = field.get(this) as MutableStateFlow<CreateClientUiState>
+            stateFlow.value = CreateClientUiState.Form(formState)
+        }
 
-        viewModel.saveClient(original, updatedClient, emptyList())
+        val events = mutableListOf<CreateClientEvent>()
+        val job = launch { viewModel.events.toList(events) }
 
-        val event = viewModel.events.first()
+        // 2. Ejecutamos el guardado con cambios CLAROS
+        viewModel.saveClient(
+            name = "Tony",           // Igual
+            lastName = "Old",        // Igual
+            email = "nuevo@mail.com", // CAMBIO
+            company = "Orion",       // Igual
+            phone = "123",           // Igual
+            address1 = "Calle Nueva", // CAMBIO
+            address2 = "",
+            photoResId = 1           // Igual
+        )
 
-        coVerify { updateClient(updatedClient, emptyList()) }
-        assert(event is CreateClientEvent.Updated)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { updateClient(any(), any()) }
+        assert(events.any { it is CreateClientEvent.Updated })
+
+        job.cancel()
     }
 
-
+    // -------------------------
     // NO CHANGES
+    // -------------------------
     @Test
     fun `saveClient - no changes detected`() = runTest {
-        val client = Client(id = 1, name = "Tony", lastName = "Test")
 
-        val original = ClientWithAddresses(
-            client = client,
-            addresses = emptyList()
+        val client = Client(
+            id = 1,
+            name = "Tony",
+            lastName = "Test",
+            email = "test@mail.com",
+            company = "Orion",
+            phone = "123"
         )
 
-        viewModel.saveClient(original, client, emptyList())
+        val formState = CreateClientFormState(
+            client = client,
+            addresses = listOf(Address(0, "Address 1", 1)),
+            isEditMode = true
+        )
 
-        val event = viewModel.events.first()
+        // 👇 Setear estado manual
+        viewModel.apply {
+            val field = this::class.java.getDeclaredField("_uiState")
+            field.isAccessible = true
+            val stateFlow = field.get(this) as MutableStateFlow<CreateClientUiState>
+            stateFlow.value = CreateClientUiState.Form(formState)
+        }
 
-        assert(event is CreateClientEvent.ShowMessage)
+        val events = mutableListOf<CreateClientEvent>()
+        val job = launch { viewModel.events.toList(events) }
+
+        viewModel.saveClient(
+            name = "Tony",
+            lastName = "Test",
+            email = "test@mail.com",
+            company = "Orion",
+            phone = "123",
+            address1 = "Address 1",
+            address2 = "",
+            photoResId = 0
+        )
+
+        advanceUntilIdle()
+
+        assert(events.any { it is CreateClientEvent.ShowMessage })
+
+        job.cancel()
     }
 
-
+    // -------------------------
     // ERROR CASE
+    // -------------------------
     @Test
     fun `saveClient - error while saving`() = runTest {
-        val client = Client(id = 0, name = "Tony", lastName = "Test")
 
-        coEvery { insertClient(client, emptyList()) } throws RuntimeException("DB error")
+        coEvery { insertClient(any(), any()) } throws RuntimeException("DB error")
 
-        viewModel.saveClient(null, client, emptyList())
+        viewModel.saveClient(
+            name = "Tony",
+            lastName = "Test",
+            email = "mail@test.com",
+            company = "Orion",
+            phone = "123",
+            address1 = "Address",
+            address2 = "",
+            photoResId = 0
+        )
 
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
-
         assert(state is CreateClientUiState.Error)
     }
 }

@@ -1,7 +1,6 @@
 package com.pangea.oriontek.ui.home.states
 
 import com.pangea.oriontek.domain.model.Client
-import com.pangea.oriontek.domain.model.ClientWithAddresses
 
 sealed class HomeUiState {
 

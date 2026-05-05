@@ -27,7 +27,7 @@
     <string name="message_no_changes_detected">No has realizado ningún cambio.</string>
     <string name="message_error_save">Error al guardar </string>
     <string name="message_created_success">Creado correctamente</string>
-    <string name="message_updated_success">Updatedo correctamente</string>
+    <string name="message_updated_success">Actualizado correctamente</string>
     <string name="message_error_deleting">Error al eliminar </string>
     <string name="message_no_compatible_app_found">No se encontró ninguna aplicación compatible.</string>
 

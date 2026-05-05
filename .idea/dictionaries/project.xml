@@ -11,6 +11,9 @@
       <w>Configuracion</w>
       <w>Configuramos</w>
       <w>Confirmar</w>
+      <w>Construye</w>
+      <w>Definimos</w>
+      <w>Ejecutamos</w>
       <w>Eliminar</w>
       <w>Foto</w>
       <w>Guardar</w>
@@ -21,15 +24,22 @@
       <w>Manejo</w>
       <w>Mostrar</w>
       <w>Navegación</w>
+      <w>Nueva</w>
       <w>Obtener</w>
       <w>Seleccionar</w>
+      <w>Seteamos</w>
+      <w>Setear</w>
+      <w>Validar</w>
       <w>Verifica</w>
       <w>abrir</w>
       <w>actualizar</w>
       <w>anteriores</w>
+      <w>antiguo</w>
       <w>apellido</w>
       <w>arriba</w>
+      <w>automáticamente</w>
       <w>cada</w>
+      <w>claros</w>
       <w>cliente</w>
       <w>clientes</w>
       <w>compañia</w>
@@ -43,22 +53,37 @@
       <w>envía</w>
       <w>errores</w>
       <w>esperar</w>
+      <w>esten</w>
       <w>exactamente</w>
       <w>existe</w>
       <w>formulario</w>
       <w>foto</w>
       <w>función</w>
+      <w>guardado</w>
       <w>hubo</w>
+      <w>inicial</w>
       <w>itoolbar</w>
+      <w>limpiar</w>
+      <w>lista</w>
       <w>llamar</w>
+      <w>maneja</w>
+      <w>manualmente</w>
+      <w>metodo</w>
       <w>nombre</w>
       <w>nuevas</w>
       <w>opciones</w>
       <w>originales</w>
       <w>pantalla</w>
+      <w>partir</w>
       <w>recarga</w>
       <w>retorno</w>
       <w>seguro</w>
+      <w>sistema</w>
+      <w>usando</w>
+      <w>vacio</w>
+      <w>validación</w>
+      <w>validar</w>
+      <w>válidas</w>
     </words>
   </dictionary>
 </component>
