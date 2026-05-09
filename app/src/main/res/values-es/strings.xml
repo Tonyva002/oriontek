@@ -4,7 +4,7 @@
     <!-- Fields -->
     <string name="name">Nombre</string>
     <string name="lastname">Apellido</string>
-    <string name="company">Companía</string>
+    <string name="company">Compañía</string>
     <string name="email">Correo electronico</string>
     <string name="phone">Telefono</string>
     <string name="address">Dirección</string>
@@ -18,6 +18,8 @@
     <string name="title">Clientes</string>
     <string name="select_image">Seleccionar imagen</string>
     <string name="cancel">Cancelar</string>
+    <string name="camera">Cámara</string>
+    <string name="gallery">Galeria</string>
 
 
     <!-- Message -->

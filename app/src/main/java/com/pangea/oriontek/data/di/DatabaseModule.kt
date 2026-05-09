@@ -24,7 +24,7 @@ object DatabaseModule {
         ClientDatabase::class.java,
         "oriontek_db"
     )
-        .fallbackToDestructiveMigration(false)
+        .fallbackToDestructiveMigration(true)
         .build()
 
     @Provides

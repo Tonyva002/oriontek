@@ -11,6 +11,7 @@ data class CreateClientFormState(
 )
 
 data class ValidationErrors(
+    val image: String? = null,
     val name: String? = null,
     val lastName: String? = null,
     val email: String? = null,
@@ -19,7 +20,7 @@ data class ValidationErrors(
     val address: String? = null
 ) {
     fun hasErrors() =
-        listOf(name, lastName, email, phone, address).any { it != null }
+        listOf(image, name, lastName, email, phone, address).any { it != null }
 }
 
 sealed class CreateClientUiState {

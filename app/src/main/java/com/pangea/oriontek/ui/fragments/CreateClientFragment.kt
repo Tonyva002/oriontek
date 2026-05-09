@@ -1,6 +1,7 @@
 package com.pangea.oriontek.ui.fragments
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
@@ -14,6 +15,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.pangea.oriontek.R
+import android.net.Uri
+import android.os.Environment
+import androidx.core.content.FileProvider
+import java.io.File
+import androidx.activity.result.contract.ActivityResultContracts
+import com.pangea.oriontek.databinding.DialogImagePickerBinding
 import com.pangea.oriontek.databinding.FragmentCreateClientBinding
 import com.pangea.oriontek.domain.model.Address
 import com.pangea.oriontek.domain.model.Client
@@ -23,6 +30,7 @@ import com.pangea.oriontek.ui.fragments.states.ValidationErrors
 import com.pangea.oriontek.ui.home.HomeActivity.Companion.ARG_ID
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 @AndroidEntryPoint
 class CreateClientFragment : Fragment() {
@@ -30,12 +38,56 @@ class CreateClientFragment : Fragment() {
     private lateinit var binding: FragmentCreateClientBinding
     private val viewModel: CreateClientViewModel by viewModels()
 
-    private val photos = arrayOf(
-        R.drawable.photo_01, R.drawable.photo_02, R.drawable.photo_03,
-        R.drawable.photo_04, R.drawable.photo_05, R.drawable.photo_06,
-    )
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    private var cameraImageUri: Uri? = null
+
+
+    // Lanzar la galleria
+    /*private val galleryLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+
+        uri?.let {
+            viewModel.updatePhoto(it.toString())
+        }
+    }*/
+
+    private val galleryLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+
+        uri?.let {
+
+            requireContext().contentResolver.takePersistableUriPermission(
+                it,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+
+            viewModel.updatePhoto(it.toString())
+        }
+    }
+
+
+    // Lanzar la camara
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+
+        if (success && cameraImageUri != null) {
+            viewModel.updatePhoto(
+                cameraImageUri.toString()
+            )
+
+        }
+
+    }
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentCreateClientBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -63,9 +115,12 @@ class CreateClientFragment : Fragment() {
                             fillFields(state.data.client, state.data.addresses)
                             showErrors(state.errors)
                         }
+
                         is CreateClientUiState.Error -> {
-                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT)
+                                .show()
                         }
+
                         else -> Unit
                     }
                 }
@@ -79,13 +134,23 @@ class CreateClientFragment : Fragment() {
                 viewModel.events.collect { event ->
                     when (event) {
                         is CreateClientEvent.Created -> {
-                            Toast.makeText(requireContext(), R.string.message_created_success, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                R.string.message_created_success,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             clearFields()
                         }
+
                         is CreateClientEvent.Updated -> {
-                            Toast.makeText(requireContext(), R.string.message_updated_success, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                R.string.message_updated_success,
+                                Toast.LENGTH_SHORT
+                            ).show()
                             requireActivity().onBackPressedDispatcher.onBackPressed()
                         }
+
                         is CreateClientEvent.ShowMessage -> {
                             Toast.makeText(requireContext(), event.resId, Toast.LENGTH_SHORT).show()
                         }
@@ -93,6 +158,22 @@ class CreateClientFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun createImageUri(): Uri {
+        val image = File.createTempFile(
+            "camera_image_",
+            ".jpg",
+            requireContext().getExternalFilesDir(
+                Environment.DIRECTORY_PICTURES
+            )
+        )
+        return FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.provider",
+            image
+
+        )
     }
 
     private fun setupTextWatchers() = with(binding) {
@@ -105,6 +186,7 @@ class CreateClientFragment : Fragment() {
         etAddress2.doAfterTextChanged { viewModel.updateAddress(1, it.toString()) }
     }
 
+    // Llenar los campos
     private fun fillFields(client: Client, addresses: List<Address>) = with(binding) {
         setTextIfDifferent(etName, client.name)
         setTextIfDifferent(etLastname, client.lastName)
@@ -115,8 +197,33 @@ class CreateClientFragment : Fragment() {
         setTextIfDifferent(etAddress, addresses.getOrNull(0)?.fullAddress.orEmpty())
         setTextIfDifferent(etAddress2, addresses.getOrNull(1)?.fullAddress.orEmpty())
 
-        val photoRes = if (client.photoResId != 0) client.photoResId else photos[0]
-        imgPhoto.setImageResource(photoRes)
+        if (client.photoUri.isNotEmpty()) {
+
+            try {
+
+                imgPhoto.setImageURI(
+                    client.photoUri.toUri()
+                )
+
+            } catch (_: SecurityException) {
+
+                imgPhoto.setImageResource(
+                    R.drawable.photo_01
+                )
+
+            } catch (_: Exception) {
+
+                imgPhoto.setImageResource(
+                    R.drawable.photo_01
+                )
+            }
+
+        } else {
+
+            imgPhoto.setImageResource(
+                R.drawable.photo_01
+            )
+        }
     }
 
     private fun setTextIfDifferent(editText: EditText, newText: String) {
@@ -134,14 +241,29 @@ class CreateClientFragment : Fragment() {
         tilAddress.error = e.address
     }
 
+
+    // Seleccionar foto (dialog)
     private fun selectPhoto() {
-        AlertDialog.Builder(requireContext())
+
+        val dialogBinding = DialogImagePickerBinding.inflate(layoutInflater)
+
+        val dialog = AlertDialog.Builder(requireContext())
             .setTitle(R.string.select_image)
-            .setItems(Array(photos.size) { "Foto ${it + 1}" }) { _, which ->
-                viewModel.updatePhoto(photos[which])
-            }
+            .setView(dialogBinding.root)
             .setNegativeButton(R.string.cancel, null)
-            .show()
+            .create()
+
+        dialogBinding.btnCamera.setOnClickListener {
+            cameraImageUri = createImageUri()
+            cameraLauncher.launch(cameraImageUri)
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnGallery.setOnClickListener {
+            galleryLauncher.launch(arrayOf("image/*"))
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     private fun setupListeners() {
@@ -160,10 +282,17 @@ class CreateClientFragment : Fragment() {
             override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
                 inflater.inflate(R.menu.menu, menu)
             }
+
             override fun onMenuItemSelected(item: MenuItem): Boolean {
                 return when (item.itemId) {
-                    R.id.action_save -> { viewModel.saveClient(); true }
-                    android.R.id.home -> { requireActivity().onBackPressedDispatcher.onBackPressed(); true }
+                    R.id.action_save -> {
+                        viewModel.saveClient(); true
+                    }
+
+                    android.R.id.home -> {
+                        requireActivity().onBackPressedDispatcher.onBackPressed(); true
+                    }
+
                     else -> false
                 }
             }
@@ -171,8 +300,27 @@ class CreateClientFragment : Fragment() {
     }
 
     private fun clearFields() = with(binding) {
-        listOf(etName, etLastname, etCompany, etEmail, etPhone, etAddress, etAddress2).forEach { it.text?.clear() }
-        listOf(tilName, tilLastname, tilEmail, tilCompany, tilPhone, tilAddress).forEach { it.error = null }
-        imgPhoto.setImageResource(photos[0])
+        listOf(
+            etName,
+            etLastname,
+            etCompany,
+            etEmail,
+            etPhone,
+            etAddress,
+            etAddress2
+        ).forEach { it.text?.clear() }
+        listOf(
+            tilName,
+            tilLastname,
+            tilEmail,
+            tilCompany,
+            tilPhone,
+            tilAddress
+        ).forEach { it.error = null }
+
+        imgPhoto.setImageResource(
+            R.drawable.photo_01
+        )
+        viewModel.updatePhoto("")
     }
 }

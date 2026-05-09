@@ -10,7 +10,7 @@ fun ClientEntity.toDomain() = Client(
     company = company,
     email = email,
     phone = phone,
-    photoResId = photoResId
+    photoUri = photoResId
 
 )
 
@@ -21,5 +21,5 @@ fun Client.toEntity() = ClientEntity(
     company = company,
     email = email,
     phone = phone,
-    photoResId = photoResId
+    photoResId = photoUri
 )

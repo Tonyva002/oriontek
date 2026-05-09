@@ -2,6 +2,7 @@ package com.pangea.oriontek.ui.fragments
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pangea.oriontek.R
 import com.pangea.oriontek.domain.model.Address
 import com.pangea.oriontek.domain.model.Client
 import com.pangea.oriontek.domain.usecase.client.GetClientByIdUseCase
@@ -47,18 +48,23 @@ class CreateClientViewModel @Inject constructor(
         updateForm {
             val updated = addresses.toMutableList()
             while (updated.size <= index) {
-                updated.add(Address(
-                    id = 0,
-                    fullAddress = "",
-                    clientId = client.id))
+                updated.add(
+                    Address(
+                        id = 0,
+                        fullAddress = "",
+                        clientId = client.id
+                    )
+                )
             }
             updated[index] = updated[index].copy(fullAddress = value)
             copy(addresses = updated)
         }
     }
 
-    fun updatePhoto(photoResId: Int) {
-        updateClientField { copy(photoResId = photoResId) }
+    fun updatePhoto(uri: String) {
+        updateClientField {
+            copy(photoUri = uri)
+        }
     }
 
     private fun updateForm(transform: CreateClientFormState.() -> CreateClientFormState) {
@@ -105,7 +111,19 @@ class CreateClientViewModel @Inject constructor(
 
             val errors = validate(form.client, addr1)
             if (errors.hasErrors()) {
-                _uiState.update { (it as CreateClientUiState.Form).copy(errors = errors) }
+
+                _uiState.update {
+                    (it as CreateClientUiState.Form).copy(errors = errors)
+                }
+
+                if (errors.image != null) {
+                    _events.emit(
+                        CreateClientEvent.ShowMessage(
+                            R.string.select_image
+                        )
+                    )
+                }
+
                 return@launch
             }
 
@@ -127,12 +145,14 @@ class CreateClientViewModel @Inject constructor(
 
     private fun validate(client: Client, address1: String): ValidationErrors {
         return ValidationErrors(
+            image = if (client.photoUri.isBlank()) "Required" else null,
             name = if (client.name.isBlank()) "Required" else null,
             lastName = if (client.lastName.isBlank()) "Required" else null,
             email = if (client.email.isBlank()) "Required" else null,
             company = if (client.company.isBlank()) "Required" else null,
             phone = if (client.phone.isBlank()) "Required" else null,
-            address = if (address1.isBlank()) "Required" else null
+            address = if (address1.isBlank()) "Required" else null,
+
         )
     }
 

@@ -11,7 +11,7 @@ import com.pangea.oriontek.data.local.entity.ClientEntity
     entities = [
         ClientEntity::class,
         AddressEntity::class ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class ClientDatabase : RoomDatabase(){

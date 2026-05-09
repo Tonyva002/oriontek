@@ -22,7 +22,7 @@ class ClientViewHolder(
         tvCompany.text = client.company
 
         Glide.with(root.context)
-            .load(client.photoResId)
+            .load(client.photoUri)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .centerCrop()
             .circleCrop()

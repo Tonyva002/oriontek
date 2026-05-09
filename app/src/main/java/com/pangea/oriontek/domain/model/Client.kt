@@ -7,6 +7,6 @@ data class Client(
     val company: String = "",
     val email: String = "",
     val phone: String = "",
-    val photoResId: Int = 0,
+    val photoUri: String = ""
 
     )
