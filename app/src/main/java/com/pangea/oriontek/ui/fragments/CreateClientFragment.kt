@@ -2,12 +2,8 @@ package com.pangea.oriontek.ui.fragments
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
@@ -28,30 +24,18 @@ import com.pangea.oriontek.ui.home.HomeActivity.Companion.ARG_ID
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
 @AndroidEntryPoint
 class CreateClientFragment : Fragment() {
 
     private lateinit var binding: FragmentCreateClientBinding
     private val viewModel: CreateClientViewModel by viewModels()
 
-    private var indexPhoto = 0
-
-    private var isFirstLoad = true
-
     private val photos = arrayOf(
-        R.drawable.photo_01,
-        R.drawable.photo_02,
-        R.drawable.photo_03,
-        R.drawable.photo_04,
-        R.drawable.photo_05,
-        R.drawable.photo_06,
+        R.drawable.photo_01, R.drawable.photo_02, R.drawable.photo_03,
+        R.drawable.photo_04, R.drawable.photo_05, R.drawable.photo_06,
     )
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentCreateClientBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -62,7 +46,7 @@ class CreateClientFragment : Fragment() {
         setupActionBar(id != 0L)
         setupMenu()
         setupListeners()
-        setupTextWatchers() // 👈 NUEVO
+        setupTextWatchers()
 
         if (id != 0L) viewModel.loadClient(id)
 
@@ -70,40 +54,19 @@ class CreateClientFragment : Fragment() {
         observeEvents()
     }
 
-    // -------------------------
-    // OBSERVERS
-    // -------------------------
     private fun observeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-
                     when (state) {
-
-                        is CreateClientUiState.Loading -> {
-
-                        }
-
                         is CreateClientUiState.Form -> {
-
-                            if (isFirstLoad) {
-                                fillFields(
-                                    client = state.data.client,
-                                    addresses = state.data.addresses
-                                )
-                                isFirstLoad = false
-                            }
-
+                            fillFields(state.data.client, state.data.addresses)
                             showErrors(state.errors)
                         }
-
                         is CreateClientUiState.Error -> {
-                            Toast.makeText(
-                                requireContext(),
-                                state.message,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT).show()
                         }
+                        else -> Unit
                     }
                 }
             }
@@ -115,120 +78,53 @@ class CreateClientFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.events.collect { event ->
                     when (event) {
-
-                        is CreateClientEvent.ShowMessage -> {
-                            Toast.makeText(
-                                requireContext(),
-                                event.resId,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        CreateClientEvent.Created -> {
-                            Toast.makeText(
-                                requireContext(),
-                                R.string.message_created_success,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        is CreateClientEvent.Created -> {
+                            Toast.makeText(requireContext(), R.string.message_created_success, Toast.LENGTH_SHORT).show()
                             clearFields()
                         }
-
-                        CreateClientEvent.Updated -> {
-                            Toast.makeText(
-                                requireContext(),
-                                R.string.message_updated_success,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        is CreateClientEvent.Updated -> {
+                            Toast.makeText(requireContext(), R.string.message_updated_success, Toast.LENGTH_SHORT).show()
                             requireActivity().onBackPressedDispatcher.onBackPressed()
                         }
-
+                        is CreateClientEvent.ShowMessage -> {
+                            Toast.makeText(requireContext(), event.resId, Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
         }
     }
 
-
-    // ActionBar (Crear cliente o actualizar cliente)
-    private fun setupActionBar(isEditMode: Boolean) {
-        (activity as? AppCompatActivity)?.supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setTitle(
-                if (isEditMode) R.string.update_client
-                else R.string.create_client
-            )
-        }
-    }
-
-    // Menu
-    private fun setupMenu() {
-        requireActivity().addMenuProvider(object : MenuProvider {
-
-            override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
-                inflater.inflate(R.menu.menu, menu)
-            }
-
-            override fun onMenuItemSelected(item: MenuItem): Boolean {
-                return when (item.itemId) {
-
-                    R.id.action_save -> {
-                        saveClient()
-                        true
-                    }
-
-                    android.R.id.home -> {
-                        requireActivity().onBackPressedDispatcher.onBackPressed()
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-    }
-
-    private fun setupListeners() {
-        binding.btnChangePhoto.setOnClickListener {
-            selectPhoto()
-        }
-    }
-
-    //Limpiar errores automáticamente
     private fun setupTextWatchers() = with(binding) {
-        val fields = listOf(
-            etName to tilName,
-            etLastname to tilLastname,
-            etEmail to tilEmail,
-            etCompany to tilCompany,
-            etPhone to tilPhone,
-            etAddress to tilAddress
-        )
+        etName.doAfterTextChanged { viewModel.updateClientField { copy(name = it.toString()) } }
+        etLastname.doAfterTextChanged { viewModel.updateClientField { copy(lastName = it.toString()) } }
+        etEmail.doAfterTextChanged { viewModel.updateClientField { copy(email = it.toString()) } }
+        etCompany.doAfterTextChanged { viewModel.updateClientField { copy(company = it.toString()) } }
+        etPhone.doAfterTextChanged { viewModel.updateClientField { copy(phone = it.toString()) } }
+        etAddress.doAfterTextChanged { viewModel.updateAddress(0, it.toString()) }
+        etAddress2.doAfterTextChanged { viewModel.updateAddress(1, it.toString()) }
+    }
 
-        fields.forEach { (editText, layout) ->
-            editText.doAfterTextChanged {
-                layout.error = null
-            }
+    private fun fillFields(client: Client, addresses: List<Address>) = with(binding) {
+        setTextIfDifferent(etName, client.name)
+        setTextIfDifferent(etLastname, client.lastName)
+        setTextIfDifferent(etCompany, client.company)
+        setTextIfDifferent(etEmail, client.email)
+        setTextIfDifferent(etPhone, client.phone)
+
+        setTextIfDifferent(etAddress, addresses.getOrNull(0)?.fullAddress.orEmpty())
+        setTextIfDifferent(etAddress2, addresses.getOrNull(1)?.fullAddress.orEmpty())
+
+        val photoRes = if (client.photoResId != 0) client.photoResId else photos[0]
+        imgPhoto.setImageResource(photoRes)
+    }
+
+    private fun setTextIfDifferent(editText: EditText, newText: String) {
+        if (editText.text.toString() != newText) {
+            editText.setText(newText)
         }
     }
 
-
-    // Guardar cliente (Guardar o actualizar de maneja en el viewmodel)
-    private fun saveClient() {
-        viewModel.saveClient(
-            name = binding.etName.text.toString(),
-            lastName = binding.etLastname.text.toString(),
-            email = binding.etEmail.text.toString(),
-            company = binding.etCompany.text.toString(),
-            phone = binding.etPhone.text.toString(),
-            address1 = binding.etAddress.text.toString(),
-            address2 = binding.etAddress2.text.toString(),
-            photoResId = photos[indexPhoto]
-        )
-    }
-
-
-    // Mostrar errores en los campos
     private fun showErrors(e: ValidationErrors) = with(binding) {
         tilName.error = e.name
         tilLastname.error = e.lastName
@@ -238,70 +134,45 @@ class CreateClientFragment : Fragment() {
         tilAddress.error = e.address
     }
 
-
-    // Llenar los campos
-    private fun fillFields(
-        client: Client,
-        addresses: List<Address>
-    ) = with(binding) {
-
-        etName.setText(client.name)
-        etLastname.setText(client.lastName)
-        etCompany.setText(client.company)
-        etEmail.setText(client.email)
-        etPhone.setText(client.phone)
-
-        etAddress.setText(addresses.getOrNull(0)?.fullAddress.orEmpty())
-        etAddress2.setText(addresses.getOrNull(1)?.fullAddress.orEmpty())
-
-        indexPhoto = photos.indexOf(client.photoResId)
-            .takeIf { it != -1 } ?: 0
-
-        imgPhoto.setImageResource(photos[indexPhoto])
-    }
-
-
-    // Seleccionar foto
     private fun selectPhoto() {
         AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.select_image))
-            .setItems(
-                arrayOf(
-                    "Foto 1",
-                    "Foto 2",
-                    "Foto 3",
-                    "Foto 4",
-                    "Foto 5",
-                    "Foto 6"
-                )
-            ) { _, which ->
-                indexPhoto = which
-                binding.imgPhoto.setImageResource(photos[indexPhoto])
+            .setTitle(R.string.select_image)
+            .setItems(Array(photos.size) { "Foto ${it + 1}" }) { _, which ->
+                viewModel.updatePhoto(photos[which])
             }
-            .setNegativeButton(getString(R.string.cancel), null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
+    private fun setupListeners() {
+        binding.btnChangePhoto.setOnClickListener { selectPhoto() }
+    }
 
-    // Limpiar los campos
+    private fun setupActionBar(isEditMode: Boolean) {
+        (activity as? AppCompatActivity)?.supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setTitle(if (isEditMode) R.string.update_client else R.string.create_client)
+        }
+    }
+
+    private fun setupMenu() {
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
+                inflater.inflate(R.menu.menu, menu)
+            }
+            override fun onMenuItemSelected(item: MenuItem): Boolean {
+                return when (item.itemId) {
+                    R.id.action_save -> { viewModel.saveClient(); true }
+                    android.R.id.home -> { requireActivity().onBackPressedDispatcher.onBackPressed(); true }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
     private fun clearFields() = with(binding) {
-        etName.text?.clear()
-        etLastname.text?.clear()
-        etCompany.text?.clear()
-        etEmail.text?.clear()
-        etPhone.text?.clear()
-        etAddress.text?.clear()
-        etAddress2.text?.clear()
-
-        // limpiar errores
-        tilName.error = null
-        tilLastname.error = null
-        tilEmail.error = null
-        tilCompany.error = null
-        tilPhone.error = null
-        tilAddress.error = null
-
-        indexPhoto = 0
-        imgPhoto.setImageResource(R.drawable.photo_01)
+        listOf(etName, etLastname, etCompany, etEmail, etPhone, etAddress, etAddress2).forEach { it.text?.clear() }
+        listOf(tilName, tilLastname, tilEmail, tilCompany, tilPhone, tilAddress).forEach { it.error = null }
+        imgPhoto.setImageResource(photos[0])
     }
 }

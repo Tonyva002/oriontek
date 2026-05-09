@@ -15,6 +15,7 @@ class ClientRepositoryImpl @Inject constructor(
     private val clientDao: ClientDao
 ) : ClientRepository {
 
+    // Obtener todos los clientes
     override fun getClients(): Flow<List<ClientWithAddresses>> {
         return clientDao.getClientsWithAddresses().map { list ->
             list.map { relation ->
@@ -26,6 +27,7 @@ class ClientRepositoryImpl @Inject constructor(
         }
     }
 
+    // Obtener cliente por id
     override fun getClientById(clientId: Long): Flow<ClientWithAddresses?> {
         return clientDao.getClientWithAddressesById(clientId).map { relation ->
             relation?.let {
@@ -37,6 +39,7 @@ class ClientRepositoryImpl @Inject constructor(
         }
     }
 
+    // Buscar clientes por nombre, apellido o compañia
     override fun searchClients(query: String): Flow<List<ClientWithAddresses>> {
         return clientDao.searchClients(query).map { list ->
             list.map { relation ->
