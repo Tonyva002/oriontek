@@ -11,7 +11,7 @@ The goal is to have control over all clients belonging to the company OrionTek, 
 ### Links, verion jetpack compose
 📌 Live site URL: [here](https://github.com/Tonyva002/clients)
 
-https://github.com/Tonyva002/clients
+
 ### Built with
 
 - Kotlin
