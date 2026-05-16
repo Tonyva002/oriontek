@@ -44,7 +44,7 @@ Install Android Studio
 ![Screen 1](https://github.com/user-attachments/assets/e5bc0650-0896-4138-809d-d149eb6626d3)
 
 ### 2) Pantalla de agregar cliente
-![Screen 2](https://github.com/user-attachments/assets/44b8a855-d2ba-41da-ae09-58a297d1f51d)
+![Screen 2](https://github.com/user-attachments/assets/af388884-c397-4704-a0be-2f8fe623c009)
 
 ### 3) Pantalla de agregar cliente, seleccionar imagen (camara - galeria)
 ![Screen 3](https://github.com/user-attachments/assets/900fe7d6-d78e-47a7-8121-fd51b9e6758d)
