@@ -6,7 +6,7 @@ import com.pangea.oriontek.domain.model.Client
 fun ClientEntity.toDomain() = Client(
     id = id,
     name = name,
-    lastName = lastName,
+    lastname = lastName,
     company = company,
     email = email,
     phone = phone,
@@ -17,7 +17,7 @@ fun ClientEntity.toDomain() = Client(
 fun Client.toEntity() = ClientEntity(
     id = id,
     name = name,
-    lastName = lastName,
+    lastName = lastname,
     company = company,
     email = email,
     phone = phone,

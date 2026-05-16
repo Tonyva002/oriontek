@@ -43,15 +43,6 @@ class CreateClientFragment : Fragment() {
 
 
     // Lanzar la galleria
-    /*private val galleryLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-
-        uri?.let {
-            viewModel.updatePhoto(it.toString())
-        }
-    }*/
-
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -95,7 +86,6 @@ class CreateClientFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val id = arguments?.getLong(ARG_ID, 0L) ?: 0L
 
-        setupActionBar(id != 0L)
         setupMenu()
         setupListeners()
         setupTextWatchers()
@@ -112,6 +102,7 @@ class CreateClientFragment : Fragment() {
                 viewModel.uiState.collect { state ->
                     when (state) {
                         is CreateClientUiState.Form -> {
+                            setupActionBar(state.data.isEditMode)
                             fillFields(state.data.client, state.data.addresses)
                             showErrors(state.errors)
                         }
@@ -160,6 +151,7 @@ class CreateClientFragment : Fragment() {
         }
     }
 
+    // Imagen de la camara
     private fun createImageUri(): Uri {
         val image = File.createTempFile(
             "camera_image_",
@@ -178,7 +170,7 @@ class CreateClientFragment : Fragment() {
 
     private fun setupTextWatchers() = with(binding) {
         etName.doAfterTextChanged { viewModel.updateClientField { copy(name = it.toString()) } }
-        etLastname.doAfterTextChanged { viewModel.updateClientField { copy(lastName = it.toString()) } }
+        etLastname.doAfterTextChanged { viewModel.updateClientField { copy(lastname = it.toString()) } }
         etEmail.doAfterTextChanged { viewModel.updateClientField { copy(email = it.toString()) } }
         etCompany.doAfterTextChanged { viewModel.updateClientField { copy(company = it.toString()) } }
         etPhone.doAfterTextChanged { viewModel.updateClientField { copy(phone = it.toString()) } }
@@ -189,7 +181,7 @@ class CreateClientFragment : Fragment() {
     // Llenar los campos
     private fun fillFields(client: Client, addresses: List<Address>) = with(binding) {
         setTextIfDifferent(etName, client.name)
-        setTextIfDifferent(etLastname, client.lastName)
+        setTextIfDifferent(etLastname, client.lastname)
         setTextIfDifferent(etCompany, client.company)
         setTextIfDifferent(etEmail, client.email)
         setTextIfDifferent(etPhone, client.phone)
@@ -233,16 +225,28 @@ class CreateClientFragment : Fragment() {
     }
 
     private fun showErrors(e: ValidationErrors) = with(binding) {
-        tilName.error = e.name
-        tilLastname.error = e.lastName
-        tilEmail.error = e.email
-        tilCompany.error = e.company
-        tilPhone.error = e.phone
-        tilAddress.error = e.address
+
+        tilName.error =
+            e.name?.let { getString(it) }
+
+        tilLastname.error =
+            e.lastname?.let { getString(it) }
+
+        tilEmail.error =
+            e.email?.let { getString(it) }
+
+        tilCompany.error =
+            e.company?.let { getString(it) }
+
+        tilPhone.error =
+            e.phone?.let { getString(it) }
+
+        tilAddress.error =
+            e.address1?.let { getString(it) }
     }
 
 
-    // Seleccionar foto (dialog)
+    // Seleccionar foto (camera - gallery)
     private fun selectPhoto() {
 
         val dialogBinding = DialogImagePickerBinding.inflate(layoutInflater)

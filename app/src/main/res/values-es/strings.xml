@@ -31,7 +31,13 @@
     <string name="message_created_success">Creado correctamente</string>
     <string name="message_updated_success">Actualizado correctamente</string>
     <string name="message_error_deleting">Error al eliminar </string>
+    <string name="message_not_found_client">No se encontró el cliente</string>
+    <string name="message_not_network">Revisa tu conexión a internet</string>
+    <string name="message_server_not_responding">El servidor no responde</string>
+    <string name="message_error">Ha ocurrido un error</string>
     <string name="message_no_compatible_app_found">No se encontró ninguna aplicación compatible.</string>
+    <string name="message_select_image">Selecciona una imagen</string>
+    <string name="message_client_not_found">Cliente no encontrado</string>
 
     <string name="dialog_delete_title">Eliminar al client?</string>
     <string name="dialog_delete_confirm">Eliminar</string>

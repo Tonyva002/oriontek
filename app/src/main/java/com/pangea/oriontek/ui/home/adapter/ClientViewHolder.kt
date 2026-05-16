@@ -17,7 +17,7 @@ class ClientViewHolder(
         tvName.text = buildString {
             append(client.name)
             append(" ")
-            append(client.lastName)
+            append(client.lastname)
         }
         tvCompany.text = client.company
 

@@ -1,11 +1,13 @@
 package com.pangea.oriontek.data.repository
 
+import android.database.sqlite.SQLiteException
 import com.pangea.oriontek.data.local.dao.ClientDao
 import com.pangea.oriontek.data.mapper.toDomain
 import com.pangea.oriontek.data.mapper.toEntity
 import com.pangea.oriontek.domain.model.Address
 import com.pangea.oriontek.domain.model.Client
 import com.pangea.oriontek.domain.model.ClientWithAddresses
+import com.pangea.oriontek.domain.model.DomainError
 import com.pangea.oriontek.domain.repository.ClientRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -55,24 +57,59 @@ class ClientRepositoryImpl @Inject constructor(
         client: Client,
         addresses: List<Address>
     ) {
-        clientDao.insertClientWithAddresses(
-            client.toEntity(),
-            addresses.map { it.toEntity() }
-        )
+
+        try {
+
+            clientDao.insertClientWithAddresses(
+                client.toEntity(),
+                addresses.map { it.toEntity() }
+            )
+
+        } catch (e: SQLiteException) {
+
+            throw DomainError.Server()
+
+        } catch (e: Exception) {
+
+            throw DomainError.Unknown()
+        }
     }
 
     override suspend fun updateClientWithAddresses(
         client: Client,
         addresses: List<Address>
     ) {
-        clientDao.updateClientWithAddresses(
-            client.toEntity(),
-            addresses.map { it.toEntity() }
-        )
+
+        try {
+
+            clientDao.updateClientWithAddresses(
+                client.toEntity(),
+                addresses.map { it.toEntity() }
+            )
+
+        } catch (e: SQLiteException) {
+
+            throw DomainError.Server()
+
+        } catch (e: Exception) {
+
+            throw DomainError.Unknown()
+        }
     }
 
-
     override suspend fun deleteClient(client: Client) {
-        clientDao.deleteClient(client.toEntity())
+
+        try {
+
+            clientDao.deleteClient(client.toEntity())
+
+        } catch (e: SQLiteException) {
+
+            throw DomainError.Server()
+
+        } catch (e: Exception) {
+
+            throw DomainError.Unknown()
+        }
     }
 }

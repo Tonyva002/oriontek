@@ -4,6 +4,7 @@ import com.pangea.oriontek.R
 import com.pangea.oriontek.domain.model.Address
 import com.pangea.oriontek.domain.model.Client
 import com.pangea.oriontek.domain.model.ClientWithAddresses
+import com.pangea.oriontek.domain.model.DomainError
 import com.pangea.oriontek.domain.usecase.client.GetClientByIdUseCase
 import com.pangea.oriontek.domain.usecase.client.InsertClientWithAddressesUseCase
 import com.pangea.oriontek.domain.usecase.client.UpdateClientWithAddressesUseCase
@@ -13,6 +14,7 @@ import com.pangea.oriontek.ui.fragments.states.CreateClientUiState
 import com.pangea.oriontek.utils.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,14 +34,20 @@ class CreateClientViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private val insertClient: InsertClientWithAddressesUseCase = mockk(relaxed = true)
-    private val updateClient: UpdateClientWithAddressesUseCase = mockk(relaxed = true)
-    private val getClientById: GetClientByIdUseCase = mockk()
+    private val insertClient: InsertClientWithAddressesUseCase =
+        mockk(relaxed = true)
+
+    private val updateClient: UpdateClientWithAddressesUseCase =
+        mockk(relaxed = true)
+
+    private val getClientById: GetClientByIdUseCase =
+        mockk()
 
     private lateinit var viewModel: CreateClientViewModel
 
     @Before
     fun setup() {
+
         viewModel = CreateClientViewModel(
             insertClient,
             updateClient,
@@ -58,12 +66,14 @@ class CreateClientViewModelTest {
             client = Client(
                 id = 1,
                 name = "Tony",
-                lastName = "Test"
+                lastname = "Test"
             ),
             addresses = emptyList()
         )
 
-        coEvery { getClientById(1) } returns flowOf(client)
+        every {
+            getClientById(1)
+        } returns flowOf(client)
 
         viewModel.loadClient(1)
 
@@ -77,7 +87,9 @@ class CreateClientViewModelTest {
     @Test
     fun `loadClient - not found`() = runTest {
 
-        coEvery { getClientById(1) } returns flowOf(null)
+        every {
+            getClientById(1)
+        } returns flowOf(null)
 
         viewModel.loadClient(1)
 
@@ -104,7 +116,7 @@ class CreateClientViewModelTest {
         viewModel.updateClientField {
             copy(
                 name = "Tony",
-                lastName = "Test",
+                lastname = "Test",
                 email = "test@mail.com",
                 company = "Orion",
                 phone = "123",
@@ -139,7 +151,7 @@ class CreateClientViewModelTest {
         val originalClient = Client(
             id = 1,
             name = "Tony",
-            lastName = "Old",
+            lastname = "Old",
             email = "old@mail.com",
             company = "Orion",
             phone = "123",
@@ -159,14 +171,19 @@ class CreateClientViewModelTest {
         )
 
         viewModel.apply {
-            val field = this::class.java.getDeclaredField("_uiState")
+
+            val field =
+                this::class.java.getDeclaredField("_uiState")
+
             field.isAccessible = true
 
             @Suppress("UNCHECKED_CAST")
             val stateFlow =
-                field.get(this) as MutableStateFlow<CreateClientUiState>
+                field.get(this)
+                        as MutableStateFlow<CreateClientUiState>
 
-            stateFlow.value = CreateClientUiState.Form(formState)
+            stateFlow.value =
+                CreateClientUiState.Form(formState)
         }
 
         val events = mutableListOf<CreateClientEvent>()
@@ -214,7 +231,7 @@ class CreateClientViewModelTest {
         viewModel.updateClientField {
             copy(
                 name = "Tony",
-                lastName = "Test",
+                lastname = "Test",
                 email = "test@mail.com",
                 company = "Orion",
                 phone = "123",
@@ -231,7 +248,7 @@ class CreateClientViewModelTest {
         assertTrue(
             events.any {
                 it is CreateClientEvent.ShowMessage &&
-                        it.resId == R.string.select_image
+                        it.resId == R.string.message_select_image
             }
         )
 
@@ -247,12 +264,12 @@ class CreateClientViewModelTest {
 
         coEvery {
             insertClient(any(), any())
-        } throws RuntimeException("DB error")
+        } throws DomainError.Unknown()
 
         viewModel.updateClientField {
             copy(
                 name = "Tony",
-                lastName = "Test",
+                lastname = "Test",
                 email = "mail@test.com",
                 company = "Orion",
                 phone = "123",

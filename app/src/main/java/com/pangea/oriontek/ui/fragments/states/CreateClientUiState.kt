@@ -8,20 +8,24 @@ data class CreateClientFormState(
     val client: Client = Client(),
     val addresses: List<Address> = emptyList(),
     val isEditMode: Boolean = false
+
 )
 
 data class ValidationErrors(
-    val image: String? = null,
-    val name: String? = null,
-    val lastName: String? = null,
-    val email: String? = null,
-    val company: String? = null,
-    val phone: String? = null,
-    val address: String? = null
-) {
+
+    val image: Int? = null,
+    val name: Int? = null,
+    val lastname: Int? = null,
+    val company: Int? = null,
+    val email: Int? = null,
+    val phone: Int? = null,
+    val address1: Int? = null
+
+){
     fun hasErrors() =
-        listOf(image, name, lastName, email, phone, address).any { it != null }
+        listOf(image, name, lastname, email, phone, address1).any {it != null}
 }
+
 
 sealed class CreateClientUiState {
 
@@ -30,9 +34,7 @@ sealed class CreateClientUiState {
     data class Form(
         val data: CreateClientFormState,
         val errors: ValidationErrors = ValidationErrors()
-    ) : CreateClientUiState()
+    ): CreateClientUiState()
 
-    data class Error(
-        val message: String
-    ) : CreateClientUiState()
+    data class Error(val message: Int): CreateClientUiState()
 }
