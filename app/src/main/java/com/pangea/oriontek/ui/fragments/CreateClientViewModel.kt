@@ -41,18 +41,18 @@ class CreateClientViewModel @Inject constructor(
     val events = _events.asSharedFlow()
 
     // Actualizar cualquier campo del Client
-    fun updateClientField(transform: Client.() -> Client) {
+    fun updateClientField(transform: Client.() -> Client) {  // Recibe una función que transforma un Client.
         updateForm {
-            copy(client = client.transform())
+            copy(client = client.transform())    // Toma el cliente actual, ejecuta la tramsformacion y lo reemplaza
         }
     }
 
-    // Actualiza una dirección dentro de la lista addresses del formulario.
+    // Actualiza una dirección específica.
     fun updateAddress(index: Int, value: String) {
         updateForm {
-            val updated = addresses.toMutableList()
+            val updated = addresses.toMutableList() // Convierte lista inmutable → mutable.
 
-            while (updated.size <= index) {
+            while (updated.size <= index) { // Si no existe esa posición: crea direcciones vacías
                 updated.add(
                     Address(
                         id = 0,
@@ -62,24 +62,25 @@ class CreateClientViewModel @Inject constructor(
                 )
             }
 
-            updated[index] = updated[index].copy(fullAddress = value)
-            copy(addresses = updated)
+            updated[index] = updated[index].copy(fullAddress = value) // Actualiza solo el texto (fullAddress).
+            copy(addresses = updated)   // Crea nuevo estado del formulario.
         }
     }
 
     // Actualiza la foto del cliente.
     fun updatePhoto(uri: String) {
-        updateClientField { copy(photoUri = uri) }
+        updateClientField { copy(photoUri = uri) }  // Reutiliza updateClientField
     }
 
+    // Actualiza el formulario de manera genérica.
     private fun updateForm(
         transform: CreateClientFormState.() -> CreateClientFormState
     ) {
-        _uiState.update { current ->
-            if (current is CreateClientUiState.Form) {
+        _uiState.update { current ->       // Obtiene el estado actual.
+            if (current is CreateClientUiState.Form) {  // Verifica que el estado sea Form
                 current.copy(
-                    data = current.data.transform(),
-                    errors = ValidationErrors()
+                    data = current.data.transform(),    // Actualiza data
+                    errors = ValidationErrors()       // Limpia errores
                 )
             } else current
         }
@@ -87,25 +88,25 @@ class CreateClientViewModel @Inject constructor(
 
     // Carga un cliente desde la base de datos y actualiza el estado.
     fun loadClient(id: Long) {
-        viewModelScope.launch {
-            _uiState.value = CreateClientUiState.Loading
+        viewModelScope.launch {  // Inicia corrutina.
+            _uiState.value = CreateClientUiState.Loading  // La UI muestra loading.
 
             try {
 
-                val result = getClientById(id).firstOrNull()
+                val result = getClientById(id).firstOrNull()    // Busca cliente.
 
-                if (result != null) {
-                    _uiState.value = CreateClientUiState.Form(
+                if (result != null) {   // Si existe
+                    _uiState.value = CreateClientUiState.Form( // Carga datos al formulario.
                         data = CreateClientFormState(
                             client = result.client,
                             addresses = result.addresses,
-                            isEditMode = true
+                            isEditMode = true              // Activa modo edición
                         )
                     )
 
                 } else {
 
-                    _uiState.value = CreateClientUiState.Error(R.string.message_client_not_found)
+                    _uiState.value = CreateClientUiState.Error(R.string.message_client_not_found) // Si no existe
                 }
             } catch (e: DomainError) {
                 _uiState.value = CreateClientUiState.Error(e.toUiMessageRes())
@@ -116,28 +117,30 @@ class CreateClientViewModel @Inject constructor(
     // Guardar cliente
     fun saveClient() {
         viewModelScope.launch {
-            val currentFormState = _uiState.value as? CreateClientUiState.Form ?: return@launch
-            val form = currentFormState.data
+            val currentFormState = _uiState.value as? CreateClientUiState.Form ?: return@launch  // Obtener formulario actual, Si el estado NO es Form, sale inmediatamente.
+            val form = currentFormState.data     // Obtener datos
 
+            // Obtener direcciones. Evita crashes. Existe: Devuelve dirección, No existe: ""
             val addr1 = form.addresses.getOrNull(0)?.fullAddress.orEmpty()
             val addr2 = form.addresses.getOrNull(1)?.fullAddress.orEmpty()
 
+            // Validación
             val errors = validate(client = form.client, address1 = addr1)
 
-            if (errors.hasErrors()) {
-                _uiState.update { current ->
+            if (errors.hasErrors()) {  // Si hay errores
+                _uiState.update { current ->   // Actualiza UI con errores
                     (current as? CreateClientUiState.Form)?.copy(errors = errors) ?: current
                 }
-                if (errors.image != null) {
+                if (errors.image != null) { // Muestra evento si falta imagen
                     _events.emit(CreateClientEvent.ShowMessage(R.string.message_select_image))
                 }
-                return@launch
+                return@launch  // Si no hay imagen sale y no guarda
             }
 
-            _uiState.value = CreateClientUiState.Loading
+            _uiState.value = CreateClientUiState.Loading  // Loading
 
             try {
-
+                // Construcción de direcciones
                 val finalAddresses = buildAddresses(
                     clientId = form.client.id,
                     currentAddresses = form.addresses,
@@ -145,10 +148,10 @@ class CreateClientViewModel @Inject constructor(
                     addr2
                 )
 
-                if (form.isEditMode) {
+                if (form.isEditMode) { // Si es edición, actualiza el cliente
                     updateClient(form.client, finalAddresses)
                     _events.emit(CreateClientEvent.Updated)
-                } else {
+                } else { // De lo contrario, inserta un nuevo cliente
                     insertClient(form.client, finalAddresses)
                     _events.emit(CreateClientEvent.Created)
                 }
@@ -158,6 +161,8 @@ class CreateClientViewModel @Inject constructor(
         }
     }
 
+
+    // Valida campos requeridos.
     private fun validate(client: Client, address1: String): ValidationErrors {
         return ValidationErrors(
             image = if (client.photoUri.isBlank()) R.string.required else null,
@@ -170,23 +175,24 @@ class CreateClientViewModel @Inject constructor(
         )
     }
 
+    // Construye lista final de direcciones.
     private fun buildAddresses(
         clientId: Long,
         currentAddresses: List<Address>,
         vararg rawAddresses: String
     ): List<Address> {
         return rawAddresses
-            .mapIndexed { index, text ->
-                if (text.isNotBlank()) {
-                    val existingId = currentAddresses.getOrNull(index)?.id ?: 0L
+            .mapIndexed { index, text ->   // Recorre con índice.
+                if (text.isNotBlank()) {   // Si no está vacío, crea Address.
+                    val existingId = currentAddresses.getOrNull(index)?.id ?: 0L   // Mantiene IDs existentes. Si editas, debe conservarse el ID.
                     Address(
                         id = existingId,
-                        fullAddress = text.trim(),
+                        fullAddress = text.trim(),  // Elimina espacios.
                         clientId = clientId
                     )
                 } else null
             }
-            .filterNotNull()
+            .filterNotNull() // Elimina direcciones vacías.
 
     }
 }

@@ -1,9 +1,11 @@
 <component name="ProjectDictionaryState">
   <dictionary name="project">
     <words>
+      <w>Activa</w>
       <w>Actualiza</w>
       <w>Actualizar</w>
       <w>Agregar</w>
+      <w>Busca</w>
       <w>Buscar</w>
       <w>Calle</w>
       <w>Cancelar</w>
@@ -11,21 +13,31 @@
       <w>Configuracion</w>
       <w>Configuramos</w>
       <w>Confirmar</w>
+      <w>Construcción</w>
       <w>Construye</w>
+      <w>Convierte</w>
       <w>Definimos</w>
       <w>Ejecutamos</w>
+      <w>Elimina</w>
       <w>Eliminar</w>
       <w>Foto</w>
       <w>Guardar</w>
+      <w>Inicia</w>
       <w>Insertar</w>
       <w>Lanzar</w>
+      <w>Limpia</w>
       <w>Limpiar</w>
       <w>Llenar</w>
       <w>Manejo</w>
+      <w>Mantiene</w>
       <w>Mostrar</w>
       <w>Navegación</w>
       <w>Nueva</w>
       <w>Obtener</w>
+      <w>Obtiene</w>
+      <w>Recibe</w>
+      <w>Recorre</w>
+      <w>Reutiliza</w>
       <w>Seleccionar</w>
       <w>Seteamos</w>
       <w>Setear</w>
@@ -45,6 +57,10 @@
       <w>cliente</w>
       <w>clientes</w>
       <w>compañia</w>
+      <w>conservarse</w>
+      <w>contrario</w>
+      <w>corrutina</w>
+      <w>crea</w>
       <w>crear</w>
       <w>cualquier</w>
       <w>datos</w>
@@ -53,42 +69,63 @@
       <w>devuelve</w>
       <w>direcciones</w>
       <w>dirección</w>
+      <w>edición</w>
+      <w>editas</w>
+      <w>ejecuta</w>
       <w>eliminación</w>
       <w>eliminar</w>
       <w>envía</w>
       <w>errores</w>
+      <w>espacios</w>
+      <w>específica</w>
       <w>esperar</w>
       <w>esten</w>
+      <w>evento</w>
       <w>exactamente</w>
       <w>existe</w>
+      <w>existentes</w>
       <w>formulario</w>
       <w>foto</w>
       <w>función</w>
       <w>guardado</w>
       <w>hubo</w>
       <w>inicial</w>
+      <w>inmediatamente</w>
+      <w>inmutable</w>
+      <w>inserta</w>
       <w>itoolbar</w>
       <w>limpiar</w>
       <w>lista</w>
       <w>llamar</w>
       <w>maneja</w>
+      <w>manera</w>
       <w>manualmente</w>
       <w>metodo</w>
+      <w>modo</w>
+      <w>muestra</w>
       <w>nombre</w>
       <w>nuevas</w>
       <w>opciones</w>
       <w>originales</w>
       <w>pantalla</w>
       <w>partir</w>
+      <w>posición</w>
       <w>recarga</w>
+      <w>reemplaza</w>
+      <w>requeridos</w>
       <w>retorno</w>
       <w>seguro</w>
       <w>sistema</w>
+      <w>texto</w>
+      <w>tramsformacion</w>
+      <w>transforma</w>
       <w>usando</w>
       <w>vacio</w>
+      <w>vacías</w>
       <w>validación</w>
       <w>validar</w>
       <w>válidas</w>
+      <w>índice</w>
     </words>
   </dictionary>
 </component>
