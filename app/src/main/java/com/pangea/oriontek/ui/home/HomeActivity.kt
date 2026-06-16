@@ -47,7 +47,14 @@ class HomeActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            
+            v.setPadding(
+                systemBars.left, 
+                systemBars.top, 
+                systemBars.right, 
+                maxOf(systemBars.bottom, ime.bottom)
+            )
             insets
         }
 
@@ -76,18 +83,23 @@ class HomeActivity : AppCompatActivity() {
 
 
     private fun setupBackStackListener() {
-        supportFragmentManager.addOnBackStackChangedListener {
-            val hasFragments =
-                supportFragmentManager.backStackEntryCount > 0
-
+        val updateVisibility = {
+            val hasFragments = supportFragmentManager.backStackEntryCount > 0
             if (hasFragments) {
-                binding.fab.hide()
+                binding.homeContent.visibility = View.GONE
             } else {
-                binding.fab.show()
+                binding.homeContent.visibility = View.VISIBLE
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
                 supportActionBar?.title = getString(R.string.app_name)
             }
         }
+
+        supportFragmentManager.addOnBackStackChangedListener {
+            updateVisibility()
+        }
+        
+        // Llamar inmediatamente para manejar restauraciones (como rotación de pantalla)
+        updateVisibility()
     }
 
     private fun setupRecyclerView() {
@@ -192,7 +204,7 @@ class HomeActivity : AppCompatActivity() {
         }
         supportFragmentManager.beginTransaction()
             .setReorderingAllowed(true)
-            .replace(R.id.main, fragment)
+            .replace(R.id.fragment_container, fragment)
             .addToBackStack(CreateClientFragment::class.java.simpleName)
             .commit()
 

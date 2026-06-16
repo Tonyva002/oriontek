@@ -72,6 +72,32 @@ class CreateClientViewModel @Inject constructor(
         updateClientField { copy(photoUri = uri) }  // Reutiliza updateClientField
     }
 
+    // Agrega un campo de dirección vacío
+    fun addAddressField() {
+        updateForm {
+            val updated = addresses.toMutableList()
+            // Usamos un ID negativo temporal para que DiffUtil lo reconozca como el mismo item al escribir
+            val tempId = if (updated.isEmpty()) -1L else updated.minOf { it.id }.coerceAtMost(0L) - 1L
+            updated.add(Address(id = tempId, fullAddress = "", clientId = client.id))
+            copy(addresses = updated)
+        }
+    }
+
+    fun resetForm() {
+        _uiState.value = CreateClientUiState.Form(data = CreateClientFormState())
+    }
+
+    // Elimina una dirección por índice
+    fun removeAddressField(index: Int) {
+        updateForm {
+            val updated = addresses.toMutableList()
+            if (index in updated.indices) {
+                updated.removeAt(index)
+            }
+            copy(addresses = updated)
+        }
+    }
+
     // Actualiza el formulario de manera genérica.
     private fun updateForm(
         transform: CreateClientFormState.() -> CreateClientFormState
@@ -117,41 +143,39 @@ class CreateClientViewModel @Inject constructor(
     // Guardar cliente
     fun saveClient() {
         viewModelScope.launch {
-            val currentFormState = _uiState.value as? CreateClientUiState.Form ?: return@launch  // Obtener formulario actual, Si el estado NO es Form, sale inmediatamente.
-            val form = currentFormState.data     // Obtener datos
-
-            // Obtener direcciones. Evita crashes. Existe: Devuelve dirección, No existe: ""
-            val addr1 = form.addresses.getOrNull(0)?.fullAddress.orEmpty()
-            val addr2 = form.addresses.getOrNull(1)?.fullAddress.orEmpty()
+            val currentFormState = _uiState.value as? CreateClientUiState.Form ?: return@launch
+            val form = currentFormState.data
 
             // Validación
-            val errors = validate(client = form.client, address1 = addr1)
+            val errors = validate(client = form.client, addresses = form.addresses)
 
-            if (errors.hasErrors()) {  // Si hay errores
-                _uiState.update { current ->   // Actualiza UI con errores
+            if (errors.hasErrors()) {
+                _uiState.update { current ->
                     (current as? CreateClientUiState.Form)?.copy(errors = errors) ?: current
                 }
-                if (errors.image != null) { // Muestra evento si falta imagen
+                if (errors.image != null) {
                     _events.emit(CreateClientEvent.ShowMessage(R.string.message_select_image))
                 }
-                return@launch  // Si no hay imagen sale y no guarda
+                return@launch
             }
 
-            _uiState.value = CreateClientUiState.Loading  // Loading
+            _uiState.value = CreateClientUiState.Loading
 
             try {
-                // Construcción de direcciones
-                val finalAddresses = buildAddresses(
-                    clientId = form.client.id,
-                    currentAddresses = form.addresses,
-                    addr1,
-                    addr2
-                )
+                // Filtrar direcciones vacías y resetear IDs temporales a 0 para la DB
+                val finalAddresses = form.addresses
+                    .filter { it.fullAddress.isNotBlank() }
+                    .map { 
+                        it.copy(
+                            id = if (it.id < 0) 0L else it.id,
+                            clientId = form.client.id 
+                        ) 
+                    }
 
-                if (form.isEditMode) { // Si es edición, actualiza el cliente
+                if (form.isEditMode) {
                     updateClient(form.client, finalAddresses)
                     _events.emit(CreateClientEvent.Updated)
-                } else { // De lo contrario, inserta un nuevo cliente
+                } else {
                     insertClient(form.client, finalAddresses)
                     _events.emit(CreateClientEvent.Created)
                 }
@@ -163,7 +187,8 @@ class CreateClientViewModel @Inject constructor(
 
 
     // Valida campos requeridos.
-    private fun validate(client: Client, address1: String): ValidationErrors {
+    private fun validate(client: Client, addresses: List<Address>): ValidationErrors {
+        val hasAtLeastOneAddress = addresses.any { it.fullAddress.isNotBlank() }
         return ValidationErrors(
             image = if (client.photoUri.isBlank()) R.string.required else null,
             name = if (client.name.isBlank()) R.string.required else null,
@@ -171,28 +196,7 @@ class CreateClientViewModel @Inject constructor(
             company = if (client.company.isBlank()) R.string.required else null,
             email = if (client.email.isBlank()) R.string.required else null,
             phone = if (client.phone.isBlank()) R.string.required else null,
-            address1 = if (address1.isBlank()) R.string.required else null
+            address1 = if (!hasAtLeastOneAddress) R.string.required else null
         )
-    }
-
-    // Construye lista final de direcciones.
-    private fun buildAddresses(
-        clientId: Long,
-        currentAddresses: List<Address>,
-        vararg rawAddresses: String
-    ): List<Address> {
-        return rawAddresses
-            .mapIndexed { index, text ->   // Recorre con índice.
-                if (text.isNotBlank()) {   // Si no está vacío, crea Address.
-                    val existingId = currentAddresses.getOrNull(index)?.id ?: 0L   // Mantiene IDs existentes. Si editas, debe conservarse el ID.
-                    Address(
-                        id = existingId,
-                        fullAddress = text.trim(),  // Elimina espacios.
-                        clientId = clientId
-                    )
-                } else null
-            }
-            .filterNotNull() // Elimina direcciones vacías.
-
     }
 }

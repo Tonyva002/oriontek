@@ -47,8 +47,7 @@
     <string name="dialog_exit_title">Exit this screen?</string>
     <string name="dialog_exit_message">If you have not saved the changes they will be lost.</string>
     <string name="dialog_exit_ok">Go out</string>
-
-
+    <string name="delete_address">Eliminar dirección</string>
 
 
 </resources>

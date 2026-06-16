@@ -27,16 +27,25 @@ import com.pangea.oriontek.domain.model.Client
 import com.pangea.oriontek.ui.fragments.states.CreateClientEvent
 import com.pangea.oriontek.ui.fragments.states.CreateClientUiState
 import com.pangea.oriontek.ui.fragments.states.ValidationErrors
+import com.pangea.oriontek.ui.fragments.adapter.AddressAdapter
 import com.pangea.oriontek.ui.home.HomeActivity.Companion.ARG_ID
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import androidx.recyclerview.widget.LinearLayoutManager
 
 @AndroidEntryPoint
 class CreateClientFragment : Fragment() {
 
     private lateinit var binding: FragmentCreateClientBinding
     private val viewModel: CreateClientViewModel by viewModels()
+
+    private val addressAdapter by lazy {
+        AddressAdapter(
+            onAddressChanged = { index, value -> viewModel.updateAddress(index, value) },
+            onRemoveAddress = { index -> viewModel.removeAddressField(index) }
+        )
+    }
 
 
     private var cameraImageUri: Uri? = null
@@ -86,6 +95,7 @@ class CreateClientFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val id = arguments?.getLong(ARG_ID, 0L) ?: 0L
 
+        setupRecyclerView()
         setupMenu()
         setupListeners()
         setupTextWatchers()
@@ -94,6 +104,14 @@ class CreateClientFragment : Fragment() {
 
         observeUiState()
         observeEvents()
+    }
+
+    private fun setupRecyclerView() {
+        binding.rvAddresses.apply {
+            adapter = addressAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            isNestedScrollingEnabled = false
+        }
     }
 
     private fun observeUiState() {
@@ -174,8 +192,6 @@ class CreateClientFragment : Fragment() {
         etEmail.doAfterTextChanged { viewModel.updateClientField { copy(email = it.toString()) } }
         etCompany.doAfterTextChanged { viewModel.updateClientField { copy(company = it.toString()) } }
         etPhone.doAfterTextChanged { viewModel.updateClientField { copy(phone = it.toString()) } }
-        etAddress.doAfterTextChanged { viewModel.updateAddress(0, it.toString()) }
-        etAddress2.doAfterTextChanged { viewModel.updateAddress(1, it.toString()) }
     }
 
     // Llenar los campos
@@ -186,8 +202,7 @@ class CreateClientFragment : Fragment() {
         setTextIfDifferent(etEmail, client.email)
         setTextIfDifferent(etPhone, client.phone)
 
-        setTextIfDifferent(etAddress, addresses.getOrNull(0)?.fullAddress.orEmpty())
-        setTextIfDifferent(etAddress2, addresses.getOrNull(1)?.fullAddress.orEmpty())
+        addressAdapter.submitList(addresses)
 
         if (client.photoUri.isNotEmpty()) {
 
@@ -221,6 +236,7 @@ class CreateClientFragment : Fragment() {
     private fun setTextIfDifferent(editText: EditText, newText: String) {
         if (editText.text.toString() != newText) {
             editText.setText(newText)
+            editText.setSelection(editText.text.length)
         }
     }
 
@@ -241,8 +257,8 @@ class CreateClientFragment : Fragment() {
         tilPhone.error =
             e.phone?.let { getString(it) }
 
-        tilAddress.error =
-            e.address1?.let { getString(it) }
+        tvAddressError.text = e.address1?.let { getString(it) }
+        tvAddressError.visibility = if (e.address1 != null) View.VISIBLE else View.GONE
     }
 
 
@@ -271,7 +287,8 @@ class CreateClientFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        binding.btnChangePhoto.setOnClickListener { selectPhoto() }
+        binding.imgPhoto.setOnClickListener { selectPhoto() }
+        binding.btnAddAddress.setOnClickListener { viewModel.addAddressField() }
     }
 
     private fun setupActionBar(isEditMode: Boolean) {
@@ -304,27 +321,19 @@ class CreateClientFragment : Fragment() {
     }
 
     private fun clearFields() = with(binding) {
-        listOf(
-            etName,
-            etLastname,
-            etCompany,
-            etEmail,
-            etPhone,
-            etAddress,
-            etAddress2
-        ).forEach { it.text?.clear() }
+        viewModel.resetForm()
+        
         listOf(
             tilName,
             tilLastname,
             tilEmail,
             tilCompany,
-            tilPhone,
-            tilAddress
+            tilPhone
         ).forEach { it.error = null }
+        tvAddressError.visibility = View.GONE
 
         imgPhoto.setImageResource(
             R.drawable.photo_01
         )
-        viewModel.updatePhoto("")
     }
 }

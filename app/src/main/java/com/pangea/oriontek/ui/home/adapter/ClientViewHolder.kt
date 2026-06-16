@@ -20,6 +20,7 @@ class ClientViewHolder(
             append(client.lastname)
         }
         tvCompany.text = client.company
+        tvPhone.text = client.phone
 
         Glide.with(root.context)
             .load(client.photoUri)
